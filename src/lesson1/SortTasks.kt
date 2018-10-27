@@ -2,6 +2,12 @@
 
 package lesson1
 
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
+import java.lang.IllegalArgumentException
+import java.util.*
+
 /**
  * Сортировка времён
  *
@@ -29,9 +35,18 @@ package lesson1
  * 19:56:14
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ *
+ * Трудоемкость: T = O(n * log(n)), где n - кол-во моментов времени
+ * Ресурсоемкость: R = O(2*n) = O(n)
  */
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    if (!inputName.matches(Regex("""^\S+?\.txt${'$'}"""))) throw IOException()
+    val list = File(inputName).readLines().toMutableList()
+    val writer = FileWriter(outputName)
+    list.forEach { if (!it.matches(Regex("""^\d.:\d.:\d.$"""))) throw IllegalArgumentException("Incorrect data") }
+    list.sort()
+    list.forEach { writer.write(it + "\n") }
+    writer.close()
 }
 
 /**
@@ -59,9 +74,34 @@ fun sortTimes(inputName: String, outputName: String) {
  * Садовая 5 - Сидоров Петр, Сидорова Мария
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ *
+ * Трудоемкость: T = O(n), где n - кол-во строчек в файле inputName
+ * Ресурсоемкость: R = O(n + n + n) = O(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    if (!inputName.matches(Regex("""^\S+?\.txt${'$'}"""))) throw IOException()
+    val lines = File(inputName).readLines()
+    val result = mutableMapOf<String, SortedSet<String>>().toSortedMap()
+    var newLine: List<String>
+
+    for (line in lines) {
+        if (!line.matches(Regex("""^[А-я]+ [А-я]+ - [А-я]+ \d+$"""))) throw IllegalArgumentException("Incorrect address")
+        else {
+            newLine = Regex("""\s-\s""").split(line)
+            if (!result.containsKey(newLine[1])) {
+                val names = mutableSetOf<String>().toSortedSet()
+                names.add(newLine[0])
+                result[newLine[1]] = names
+            }
+            else result[newLine[1]]?.add(newLine[0])
+        }
+    }
+
+    val writer = FileWriter(outputName)
+    result.forEach { address, names ->
+        writer.write("$address - " + names.joinToString(", ") + "\n")
+    }
+    writer.close()
 }
 
 /**
@@ -93,9 +133,17 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 24.7
  * 99.5
  * 121.3
+ *
+ * Трудоемкость: T = O(n * log(n)), где n - кол-во температур
+ * Ресурсоемкость: R = O(2*n) = O(n)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val lines = File(inputName).readLines()
+    val res = mutableListOf<Double>()
+    lines.forEach { res += it.toDouble() }
+    if (res.any{ it < -273.0 || it > 500.0 }) throw IllegalArgumentException("Incorrect temperature")
+    res.sort()
+    File(outputName).writeText(res.joinToString("\n"))
 }
 
 /**
@@ -146,6 +194,9 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    TODO()
+    for (i in 0 until first.size) {
+        second[i] = first[i]
+    }
+    second.sort()
 }
 

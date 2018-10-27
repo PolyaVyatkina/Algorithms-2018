@@ -1,9 +1,10 @@
 package lesson1
 
-import java.io.BufferedWriter
-import java.io.File
+import java.io.*
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.math.abs
+import kotlin.test.*
 
 abstract class AbstractTaskTests : AbstractFileTests() {
 
@@ -39,10 +40,19 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        try {
+            sortTimes("input/time_in4.txt", "temp.txt")
+            fail("Incorrect data")
+        } catch (e: IllegalArgumentException) {
+        }
+        try {
+            sortTimes("input/time_in5.txt", "temp.txt")
+            fail("IOException expected")
+        } catch (e: IOException) {
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
-        // TODO: large test
         try {
             sortAddresses("input/addr_in1.txt", "temp.txt")
             assertFileContent("temp.txt",
@@ -54,6 +64,22 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             )
         } finally {
             File("temp.txt").delete()
+        }
+        try {
+            sortAddresses("input/addr_in2.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/addr_out2.txt").readLines().joinToString("\n"))
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            sortAddresses("input/addr_in3.txt", "temp.txt")
+            fail("Incorrect address")
+        } catch (e: IllegalArgumentException) {
+        }
+        try {
+            sortTimes("input/addr_in4.txt", "temp.txt")
+            fail("IOException expected")
+        } catch (e: IOException) {
         }
     }
 
@@ -98,7 +124,12 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
-
+        try {
+            sortTemperatures("input/temp_in2.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/temp_out2.txt").readLines().joinToString("\n"))
+        } finally {
+            File("temp.txt").delete()
+        }
         fun testGeneratedTemperatures(size: Int) {
             try {
                 generateTemperatures(size)
