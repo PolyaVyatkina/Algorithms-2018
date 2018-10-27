@@ -4,6 +4,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 abstract class AbstractAlgorithmsTests {
 
@@ -71,11 +72,18 @@ abstract class AbstractAlgorithmsTests {
             assertEquals(1, josephTask(menNumber, 2))
             menNumber *= 2
         }
+        try {
+            josephTask(0, 1)
+            fail("IllegalArgumentException is expected.")
+        } catch (e: IllegalArgumentException) {
+        }
     }
 
     fun longestCommonSubstring(longestCommonSubstring: (String, String) -> String) {
+        assertEquals("", longestCommonSubstring("", "a"))
         assertEquals("", longestCommonSubstring("мой мир", "я"))
         assertEquals("зд", longestCommonSubstring("здравствуй мир", "мы здесь"))
+        assertEquals(" ", longestCommonSubstring("ЗДРАВСТВУЙ МИР", "мы здесь"))
         assertEquals("СЕРВАТОР", longestCommonSubstring("ОБСЕРВАТОРИЯ", "КОНСЕРВАТОРЫ"))
         assertEquals("огда ", longestCommonSubstring(
                 """

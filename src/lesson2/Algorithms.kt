@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.lang.IllegalArgumentException
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -75,9 +77,16 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * Х Х 3
  * Х   Х
  * Х х Х
+ *
+ * Трудоемкость Т = O(n), где n - кол-во человек
+ * Ресурсоемкость R = O(1)
  */
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    TODO()
+    if (menNumber < 1) throw IllegalArgumentException()
+    var result = 0
+    for (i in 1..menNumber)
+        result = (result + choiceInterval) % i
+    return result + 1
 }
 
 /**
@@ -90,9 +99,29 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * При сравнении подстрок, регистр символов *имеет* значение.
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
+ *
+ * Трудоемкость Т = О(n * m), где n - длина первого слова, m - длина второго слова
+ * Ресурсоемкость R = O(n * m)
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val matches = Array(first.length) { IntArray(second.length) }
+    var maxIndex = -1
+    var maxLength = 0
+    for (i in 0 until first.length) {
+        for (j in 0 until second.length) {
+            if (i > 0 && j > 0) {
+                if (first[i - 1] == second[j - 1]) {
+                    val currentLength = matches[i - 1][j - 1] + 1
+                    matches[i][j] = currentLength
+                    if (currentLength > maxLength) {
+                        maxLength = currentLength
+                        maxIndex = i
+                    }
+                }
+            }
+        }
+    }
+    return if (maxIndex == -1) "" else first.substring(maxIndex - maxLength, maxIndex)
 }
 
 /**
@@ -104,9 +133,28 @@ fun longestCommonSubstring(first: String, second: String): String {
  *
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
+ *
+ * Трудоемкость Т = O(n log log n), где n - кол-во чисел в интервале
+ * Ресурсоемкость R = O(n)
  */
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit <= 1) return 0
+    val numbers = BooleanArray(limit + 1)
+    numbers.fill(true)
+    numbers[0] = false
+    numbers[1] = false
+    for (i in 2 until numbers.size) {
+        if (numbers[i]) {
+            var k = 2
+            while (k * i < numbers.size) {
+                numbers[k * i] = false
+                k++
+            }
+        }
+    }
+    var result = 0
+    numbers.forEach { if (it) result++ }
+    return result
 }
 
 /**
