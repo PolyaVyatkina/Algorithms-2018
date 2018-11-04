@@ -66,6 +66,7 @@ fun shortestPathOnField(inputName: String): Int {
     val m = lines[0].size
     val field = Array(n) { IntArray(m) }
 
+    field[0][0] = lines[0][0].toInt()
     for (i in 1 until n) field[i][0] = field[i - 1][0] + lines[i][0].toInt()
     for (i in 1 until m) field[0][i] = field[0][i - 1] + lines[0][i].toInt()
 
