@@ -2,6 +2,9 @@
 
 package lesson6
 
+import java.io.File
+import kotlin.math.min
+
 /**
  * Наибольшая общая подпоследовательность.
  * Средняя
@@ -52,9 +55,26 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
  * Необходимо найти маршрут с минимальным весом и вернуть этот минимальный вес.
  *
  * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
+ *
+ * Трудоемкость Т = O(n * m), где n - кол-во строк таблицы, а m - кол-во столбцов
+ * Ресурсоемкость R = O(n * m + n * m) = O(n * m)
  */
 fun shortestPathOnField(inputName: String): Int {
-    TODO()
+    val  lines = mutableListOf<List<String>>()
+    File(inputName).forEachLine { lines.add(it.split(Regex("""\s"""))) }
+    val n = lines.size
+    val m = lines[0].size
+    val field = Array(n) { IntArray(m) }
+
+    for (i in 1 until n) field[i][0] = field[i - 1][0] + lines[i][0].toInt()
+    for (i in 1 until m) field[0][i] = field[0][i - 1] + lines[0][i].toInt()
+
+    for (i in 1 until n)
+        for (j in 1 until m)
+            field[i][j] = min(field[i - 1][j - 1], min(field[i][j - 1], field[i - 1][j])) + lines[i][j].toInt()
+
+    return field[n - 1][m - 1]
+
 }
 
 // Задачу "Максимальное независимое множество вершин в графе без циклов"

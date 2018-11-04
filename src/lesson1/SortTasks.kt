@@ -75,7 +75,7 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  *
- * Трудоемкость: T = O(n), где n - кол-во строчек в файле inputName
+ * Трудоемкость: T = O(n * log n), где n - кол-во строчек в файле inputName
  * Ресурсоемкость: R = O(n + n + n) = O(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {
@@ -92,8 +92,7 @@ fun sortAddresses(inputName: String, outputName: String) {
                 val names = mutableSetOf<String>().toSortedSet()
                 names.add(newLine[0])
                 result[newLine[1]] = names
-            }
-            else result[newLine[1]]?.add(newLine[0])
+            } else result[newLine[1]]?.add(newLine[0])
         }
     }
 
@@ -134,17 +133,24 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  *
- * Трудоемкость: T = O(n * log(n)), где n - кол-во температур
- * Ресурсоемкость: R = O(2*n) = O(n)
+ * Трудоемкость: T = O(n), где n - кол-во температур
+ * Ресурсоемкость: R = O(n)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    val lines = File(inputName).readLines()
-    val res = mutableListOf<Double>()
-    lines.forEach { res += it.toDouble() }
-    if (res.any{ it < -273.0 || it > 500.0 }) throw IllegalArgumentException("Incorrect temperature")
-    res.sort()
-    File(outputName).writeText(res.joinToString("\n"))
+    val temperatures = File(inputName).readLines().map { (it.toDouble() * 10).toInt() + 2730 }
+    if (temperatures.any { it < 0 || it > 7730 }) throw IllegalArgumentException("Incorrect temperature")
+
+    val count = MutableList(7731) { 0 }
+    for (temperature in temperatures) {
+        count[temperature] += 1
+    }
+    val result = mutableListOf<Double>()
+    for (it in 0 until count.size)
+        if (it >= 0)
+            for (k in 0 until count[it]) result.add((it - 2730) / 10.0)
+    File(outputName).writeText(result.joinToString("\n"))
 }
+
 
 /**
  * Сортировка последовательности
@@ -192,11 +198,21 @@ fun sortSequence(inputName: String, outputName: String) {
  * second = [null null null null null 1 3 9 13 18 23]
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
+ *
+ * Трудоемкость T = O(n), где n - second.size
+ * Ресурсоемкость R = O(1)
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    for (i in 0 until first.size) {
-        second[i] = first[i]
+    var li = 0
+    var ri = first.size
+    val begin = 0
+    val end = second.size
+    for (i in begin until end) {
+        if (li < first.size && (ri == second.size || second[ri]?.let { first[li].compareTo(it) }!! <= 0)) {
+            second[i] = first[li++]
+        } else {
+            second[i] = second[ri++]
+        }
     }
-    second.sort()
 }
 
