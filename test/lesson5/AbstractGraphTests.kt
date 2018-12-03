@@ -27,7 +27,7 @@ abstract class AbstractGraphTests {
     }
 
     fun findEulerLoop(findEulerLoop: Graph.() -> List<Graph.Edge>) {
-        val graph = GraphBuilder().apply {
+       val graph = GraphBuilder().apply {
             val a = addVertex("A")
             val b = addVertex("B")
             val c = addVertex("C")

@@ -2,6 +2,8 @@
 
 package lesson5
 
+import java.util.*
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -27,9 +29,84 @@ package lesson5
  *
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
+ *
+ * Трудоемкость Т = О(n+m), где n - кол-во вершин, m - кол-во ребер
+ * Ресурсоемкость R = О(n+m)
  */
 fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+    if (!checkForEulerLoop()) return emptyList()
+    val path: Deque<Graph.Vertex> = LinkedList()
+    for (vertex in vertices) {
+        path.addFirst(vertex)
+        break
+    }
+    val edges = edges
+    while (path.size < getEdges().size) {
+        val currentVertex = path.last()
+        var visited = true
+        for (edge in getConnections(currentVertex).values) {
+            if (edge in edges) {
+                visited = false
+                when (currentVertex) {
+                    edge.begin -> {
+                        path.addLast(edge.end)
+                        edges.remove(edge)
+                    }
+                    edge.end -> {
+                        path.addLast(edge.begin)
+                        edges.remove(edge)
+                    }
+                }
+                break
+            }
+        }
+        if (visited) {
+            if (path.last != path.first) path.addFirst(path.last)
+            path.removeLast()
+        }
+    }
+    path.addLast(path.first)
+    val result = mutableListOf<Graph.Edge>()
+    while (path.size > 1) {
+        val firstVertex = path.first
+        val connections = getConnections(firstVertex).values
+        path.removeFirst()
+        val secondVertex = path.first
+        val edge = connections.find { it.begin == secondVertex || it.end == secondVertex }
+        edge?.let { result.add(it) }
+    }
+    return result
+}
+
+fun Graph.checkForEulerLoop(): Boolean {
+    var oddVertex = 0
+    for (vertex in vertices) if (getConnections(vertex).size % 2 == 1) oddVertex++
+    if (oddVertex > 2) return false
+
+    val visited = mutableMapOf<Graph.Vertex, Boolean>()
+    for (vertex in vertices) visited[vertex] = false
+    for (vertex in vertices) {
+        if (getConnections(vertex).isNotEmpty())
+            dfs(vertex, visited)
+        break
+    }
+    for (vertex in vertices)
+        if (getConnections(vertex).isNotEmpty() && visited[vertex] == false) return false
+    return true
+}
+
+fun Graph.dfs(start: Graph.Vertex, visited: MutableMap<Graph.Vertex, Boolean>): Int {
+    var visitedVertices = 1
+    visited[start] = true
+    for (edge in getConnections(start).values) {
+        when (start) {
+            edge.begin ->
+                if (visited[edge.end] == false) visitedVertices += dfs(edge.end, visited)
+            edge.end ->
+                if (visited[edge.begin] == false) visitedVertices += dfs(edge.begin, visited)
+        }
+    }
+    return visitedVertices
 }
 
 /**
