@@ -36,10 +36,7 @@ import java.util.*
 fun Graph.findEulerLoop(): List<Graph.Edge> {
     if (!checkForEulerLoop()) return emptyList()
     val path: Deque<Graph.Vertex> = LinkedList()
-    for (vertex in vertices) {
-        path.addFirst(vertex)
-        break
-    }
+    path.addFirst(vertices.first())
     val edges = edges
     while (path.size < getEdges().size) {
         val currentVertex = path.last()
@@ -48,15 +45,10 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
             if (edge in edges) {
                 visited = false
                 when (currentVertex) {
-                    edge.begin -> {
-                        path.addLast(edge.end)
-                        edges.remove(edge)
-                    }
-                    edge.end -> {
-                        path.addLast(edge.begin)
-                        edges.remove(edge)
-                    }
+                    edge.begin -> path.addLast(edge.end)
+                    edge.end -> path.addLast(edge.begin)
                 }
+                edges.remove(edge)
                 break
             }
         }
@@ -79,10 +71,7 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
 }
 
 fun Graph.checkForEulerLoop(): Boolean {
-    var oddVertex = 0
-    for (vertex in vertices) if (getConnections(vertex).size % 2 == 1) oddVertex++
-    if (oddVertex > 2) return false
-
+    for (vertex in vertices) if (getConnections(vertex).size % 2 == 1) return false
     val visited = mutableMapOf<Graph.Vertex, Boolean>()
     for (vertex in vertices) visited[vertex] = false
     for (vertex in vertices) {
